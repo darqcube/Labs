@@ -1,4 +1,4 @@
-![Logo](./ocsne-bgp-ospf-lab/images/lab-design.png)
+![Logo](./images/lab-design.png)
 
 # OCSNE BGP/OSPF Lab
 

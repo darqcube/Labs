@@ -1,3 +1,5 @@
+![Logo](./ocsne-bgp-ospf-lab/images/lab-design.png)
+
 # OCSNE BGP/OSPF Lab
 
 This lab provides sample Cisco router configuration files for practicing BGP and OSPF routing protocols. Each file contains configuration snippets for different routers and scenarios.

@@ -11,10 +11,9 @@ This lab provides sample Cisco router configuration files for practicing BGP and
 - `b3-central.txt` — Configuration for Central Branch Router 3
 - `cr1.txt`, `cr2.txt`, `cr3.txt` — Core Router configurations
 - `cs1.txt` — Cisco Switch configuration
-- `dr1.txt` — Distribution Router configuration
+- `dr1.txt` — Disaster Recovery Router configuration
 - `ir1.txt` — Internet Router configuration
 - `telco1.txt`, `telco2.txt` — Telco Router configurations
-- `.gitkeep` — Ensures the folder is tracked by Git
 
 ## Usage
 

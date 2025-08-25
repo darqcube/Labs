@@ -1,0 +1,218 @@
+cr3#show running-config
+Building configuration...
+
+Current configuration : 5181 bytes
+!
+! Last configuration change at 12:46:31 UTC Thu Sep 2 2021
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname cr3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+crypto isakmp policy 10
+ hash sha256
+ authentication pre-share
+crypto isakmp key cisco123 address 0.0.0.0        
+crypto isakmp keepalive 10 periodic
+!
+!
+crypto ipsec transform-set strong esp-aes esp-sha512-hmac 
+ mode transport
+!
+crypto ipsec profile cisco
+ set security-association lifetime seconds 120
+ set transform-set strong 
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.101.3 255.255.255.255
+!
+interface Tunnel0
+ ip address 10.203.0.1 255.255.0.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication cisco123
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 0
+ tunnel protection ipsec profile cisco
+!
+interface GigabitEthernet0/0
+ ip address 10.1.1.3 255.255.255.0
+ ip ospf network point-to-multipoint non-broadcast
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ ip address 192.168.3.1 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 1
+ router-id 10.255.101.3
+ redistribute bgp 65503 subnets route-map tag_bgp_with_metric
+ network 10.1.1.3 0.0.0.0 area 0
+ network 10.255.101.3 0.0.0.0 area 0
+ neighbor 10.1.1.5
+!
+router bgp 65503
+ bgp router-id 10.255.101.3
+ bgp log-neighbor-changes
+ bgp listen range 10.203.0.0/16 peer-group BRANCH
+ network 10.203.0.0 mask 255.255.0.0
+ redistribute ospf 1 route-map Only_Default_Route
+ neighbor BRANCH peer-group
+ neighbor BRANCH remote-as 65505
+ neighbor BRANCH default-originate route-map AS65503MED
+ neighbor BRANCH route-map NoDefaultRoute-from-branch in
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+ip community-list standard North permit 65505:11
+ip community-list standard South permit 65505:12
+ip community-list standard Central permit 65505:13
+!
+no ip http server
+no ip http secure-server
+ip route 192.168.111.1 255.255.255.255 192.168.3.2
+ip route 192.168.112.1 255.255.255.255 192.168.3.2
+ip route 192.168.113.1 255.255.255.255 192.168.3.2
+!
+!
+ip prefix-list Default seq 5 permit 0.0.0.0/0
+!
+route-map Only_Default_Route deny 10
+ match tag 100
+!
+route-map Only_Default_Route deny 20
+ match tag 200
+!
+route-map Only_Default_Route deny 30
+ match tag 300
+!
+route-map Only_Default_Route permit 40
+ match ip address prefix-list Default
+!
+route-map NoDefaultRoute-from-branch deny 5
+ match ip address prefix-list Default
+!
+route-map NoDefaultRoute-from-branch permit 10
+!
+route-map tag_bgp_with_metric permit 10
+ match community North
+ set metric 120
+ set tag 120
+!
+route-map tag_bgp_with_metric permit 20
+ match community South
+ set metric 130
+ set tag 200
+!
+route-map tag_bgp_with_metric permit 30
+ match community Central
+ set metric 100
+ set tag 300
+!
+route-map AS65503MED permit 10
+ set metric 10
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end
+
+cr3#
